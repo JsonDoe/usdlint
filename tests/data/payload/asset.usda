@@ -1,0 +1,10 @@
+#usda 1.0
+(
+    defaultPrim = "chair"
+)
+
+def Xform "chair" (
+    prepend payload = @./geo.usda@
+)
+{
+}

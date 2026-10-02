@@ -1,0 +1,17 @@
+#usda 1.0
+(
+    defaultPrim = "geo"
+)
+
+def Xform "geo"
+{
+    def Mesh "seat"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
+        color3f[] primvars:displayColor = [(1, 0, 0), (0, 1, 0)] (
+            interpolation = "vertex"
+        )
+    }
+}
