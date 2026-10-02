@@ -1,0 +1,31 @@
+# Example studio profile: report everything, fail only on broken
+# dependencies and geometry. Run it with
+#   usdguard check --profile examples/profiles/lenient.toml assets/*.usda
+
+fail_on = "error"
+load = "all"
+checks = [
+    "stage.metadata",
+    "naming.prim_name",
+    "deps.absolute_arc_path",
+    "deps.unresolved",
+    "geom.primvar_size",
+    "geom.extent",
+]
+
+[severity]
+"stage.metadata" = "warning"
+"naming.prim_name" = "info"
+
+[options."stage.metadata"]
+up_axis = "Y"
+meters_per_unit = 0.01
+require_default_prim = false
+
+# Literal (single-quoted) strings keep backslashes as they are.
+[options."naming.prim_name".rules]
+Mesh = '^[a-z]\w*_GEO$'
+
+[options."geom.extent"]
+tolerance = 0.001
+sample_times = "all"

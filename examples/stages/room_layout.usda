@@ -1,0 +1,53 @@
+#usda 1.0
+(
+    defaultPrim = "room_GRP"
+    doc = "Assembly: instanced chairs (checked once through their prototype) and a table payload (hidden with --load none)."
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def Xform "room_GRP" (
+    kind = "assembly"
+)
+{
+    def Xform "props_GRP" (
+        kind = "group"
+    )
+    {
+        def Xform "table01_GRP" (
+            prepend payload = @./table.usda@
+        )
+        {
+        }
+
+        def Xform "chair01_GRP" (
+            instanceable = true
+            prepend references = @./chair.usda@
+        )
+        {
+            float xformOp:rotateY = 0
+            double3 xformOp:translate = (-30, 0, 55)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
+        }
+
+        def Xform "chair02_GRP" (
+            instanceable = true
+            prepend references = @./chair.usda@
+        )
+        {
+            float xformOp:rotateY = 180
+            double3 xformOp:translate = (30, 0, 55)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
+        }
+
+        def Xform "chair03_GRP" (
+            instanceable = true
+            prepend references = @./chair.usda@
+        )
+        {
+            float xformOp:rotateY = 90
+            double3 xformOp:translate = (0, 0, -60)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
+        }
+    }
+}

@@ -1,0 +1,106 @@
+#usda 1.0
+(
+    defaultPrim = "chair_GRP"
+    doc = "Clean component: passes the default profile."
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def Xform "chair_GRP" (
+    kind = "component"
+)
+{
+    def Xform "geo_GRP"
+    {
+        def Mesh "seat_GEO" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-20, 40, -20), (20, 45, 20)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+            rel material:binding = </chair_GRP/mtl/wood>
+            point3f[] points = [(-20, 40, -20), (-20, 40, 20), (-20, 45, -20), (-20, 45, 20), (20, 40, -20), (20, 40, 20), (20, 45, -20), (20, 45, 20)]
+            uniform token subdivisionScheme = "none"
+        }
+
+        def Mesh "back_GEO" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-20, 45, -20), (20, 90, -16)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+            rel material:binding = </chair_GRP/mtl/wood>
+            point3f[] points = [(-20, 45, -20), (-20, 45, -16), (-20, 90, -20), (-20, 90, -16), (20, 45, -20), (20, 45, -16), (20, 90, -20), (20, 90, -16)]
+            uniform token subdivisionScheme = "none"
+        }
+
+        def Xform "legs_GRP"
+        {
+            def Mesh "leg1_GEO" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                float3[] extent = [(-20, 0, -20), (-17, 40, -17)]
+                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+                rel material:binding = </chair_GRP/mtl/wood>
+                point3f[] points = [(-20, 0, -20), (-20, 0, -17), (-20, 40, -20), (-20, 40, -17), (-17, 0, -20), (-17, 0, -17), (-17, 40, -20), (-17, 40, -17)]
+                uniform token subdivisionScheme = "none"
+            }
+
+            def Mesh "leg2_GEO" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                float3[] extent = [(17, 0, -20), (20, 40, -17)]
+                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+                rel material:binding = </chair_GRP/mtl/wood>
+                point3f[] points = [(17, 0, -20), (17, 0, -17), (17, 40, -20), (17, 40, -17), (20, 0, -20), (20, 0, -17), (20, 40, -20), (20, 40, -17)]
+                uniform token subdivisionScheme = "none"
+            }
+
+            def Mesh "leg3_GEO" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                float3[] extent = [(-20, 0, 17), (-17, 40, 20)]
+                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+                rel material:binding = </chair_GRP/mtl/wood>
+                point3f[] points = [(-20, 0, 17), (-20, 0, 20), (-20, 40, 17), (-20, 40, 20), (-17, 0, 17), (-17, 0, 20), (-17, 40, 17), (-17, 40, 20)]
+                uniform token subdivisionScheme = "none"
+            }
+
+            def Mesh "leg4_GEO" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                float3[] extent = [(17, 0, 17), (20, 40, 20)]
+                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 0, 4, 5, 1, 2, 3, 7, 6, 0, 2, 6, 4, 1, 5, 7, 3]
+                rel material:binding = </chair_GRP/mtl/wood>
+                point3f[] points = [(17, 0, 17), (17, 0, 20), (17, 40, 17), (17, 40, 20), (20, 0, 17), (20, 0, 20), (20, 40, 17), (20, 40, 20)]
+                uniform token subdivisionScheme = "none"
+            }
+        }
+    }
+
+    def Scope "mtl"
+    {
+        def Material "wood"
+        {
+            token outputs:surface.connect = </chair_GRP/mtl/wood/preview.outputs:surface>
+
+            def Shader "preview"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.45, 0.28, 0.15)
+                float inputs:roughness = 0.6
+                token outputs:surface
+            }
+        }
+    }
+}
