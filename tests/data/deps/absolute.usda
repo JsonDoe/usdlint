@@ -1,0 +1,15 @@
+#usda 1.0
+(
+    subLayers = [
+        @/mnt/assets/shared/overrides.usda@
+    ]
+)
+
+def Xform "chair" (
+    prepend references = [
+        @./component.usda@,
+        @C:/assets/chair/chair.usda@
+    ]
+)
+{
+}

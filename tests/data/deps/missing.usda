@@ -1,0 +1,8 @@
+#usda 1.0
+
+def Xform "chair" (
+    prepend references = @./does_not_exist.usda@
+)
+{
+    asset texture = @./textures/missing.png@
+}
