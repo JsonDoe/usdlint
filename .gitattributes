@@ -1,0 +1,10 @@
+# Store LF in the repository and check out LF on every platform, so
+# Windows and Linux contributors produce identical bytes and the
+# pre-commit hooks behave the same everywhere.
+* text=auto eol=lf
+
+# Binary USD formats: crate files and zip packages. Plain .usd files
+# may be either crate or text, so they are treated as binary too.
+*.usd binary
+*.usdc binary
+*.usdz binary
