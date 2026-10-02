@@ -170,4 +170,8 @@ config or stage-open error; with several stages, the max code wins.
   rez), install usdguard with `--no-deps` to avoid shadowing it.
 - Keep the ruff and mypy revisions in `.pre-commit-config.yaml` in sync
   with the `dev` dependency group.
+- Workflows: GitHub's own `actions/*` use major tags (`@v7`). Pin
+  third-party actions to a full commit SHA with a `# vX.Y.Z` comment;
+  `astral-sh/setup-uv` publishes no floating major tags after v7, so
+  `@v10` does not resolve. Check that a ref exists before using it.
 - Line endings are LF everywhere (`.gitattributes`), including Windows.
