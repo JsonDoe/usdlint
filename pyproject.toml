@@ -41,6 +41,9 @@ classifiers = [
 # and lack the gprim encapsulation validator. CI tests this floor.
 dependencies = ["usd-core>=25.11", "tomli>=1.1; python_version < '3.11'"]
 
+[project.scripts]
+usdguard = "usdguard.cli:main"
+
 [project.entry-points."usdguard.checks"]
 "naming.prim_name" = "usdguard.checks.naming:PrimNameCheck"
 "stage.metadata" = "usdguard.checks.stage:StageMetadataCheck"
@@ -182,4 +185,5 @@ skip_covered = true
 exclude_also = [
     "if TYPE_CHECKING:",
     "@overload",
+    "if __name__ == .__main__.:",
 ]

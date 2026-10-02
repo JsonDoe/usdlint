@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "chair_GRP"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def Xform "chair_GRP" (
+    kind = "component"
+)
+{
+    def Mesh "seat_GEO" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        float3[] extent = [(0, 0, 0), (1, 1, 0)]
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </chair_GRP/looks/wood>
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
+    }
+
+    def Scope "looks"
+    {
+        def Material "wood"
+        {
+        }
+    }
+}
