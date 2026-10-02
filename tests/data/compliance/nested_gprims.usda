@@ -1,0 +1,16 @@
+#usda 1.0
+(
+    defaultPrim = "chair"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def Xform "chair"
+{
+    def Mesh "outer"
+    {
+        def Mesh "inner"
+        {
+        }
+    }
+}

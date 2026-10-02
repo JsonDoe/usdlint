@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "chair"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def Xform "chair" (
+    kind = "component"
+)
+{
+    def Mesh "seat" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        float3[] extent = [(0, 0, 0), (1, 1, 0)]
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </chair/looks/wood>
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
+    }
+
+    def Scope "looks"
+    {
+        def Material "wood"
+        {
+        }
+    }
+}
