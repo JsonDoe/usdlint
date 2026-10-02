@@ -58,6 +58,26 @@ jobs:
       - name: Test with coverage gate
         run: uv run --no-sync pytest
 
+  plugin:
+    name: Example plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - name: Install usdguard and the example plugin
+        run: |
+          uv sync --locked
+          uv pip install ./examples/custom_check_plugin
+      - name: Check that the plugin is discovered
+        run: uv run --no-sync usdguard list-checks | grep -F example.no_empty_groups
+      - name: Test the plugin
+        run: uv run --no-sync pytest examples/custom_check_plugin
+
   minimum-usd:
     name: Test (oldest supported usd-core)
     runs-on: ubuntu-latest
