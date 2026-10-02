@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "usdguard-example-plugin"
+version = "0.1.0"
+description = "Example usdguard plugin: one custom check, its tests and profile."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = ["usdguard"]
+
+# The entry point name must equal the check's check_id.
+[project.entry-points."usdguard.checks"]
+"example.no_empty_groups" = "usdguard_example_plugin.checks:NoEmptyGroupsCheck"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/usdguard_example_plugin"]
+
+[tool.pytest]
+testpaths = ["tests"]
