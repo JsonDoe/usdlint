@@ -39,7 +39,7 @@ classifiers = [
 # 25.11 is the oldest usd-core whose UsdValidation framework runs cleanly:
 # earlier releases crash while registering UsdShade connectable behaviors
 # and lack the gprim encapsulation validator. CI tests this floor.
-dependencies = ["usd-core>=25.11"]
+dependencies = ["usd-core>=25.11", "tomli>=1.1; python_version < '3.11'"]
 
 [project.entry-points."usdguard.checks"]
 "naming.prim_name" = "usdguard.checks.naming:PrimNameCheck"

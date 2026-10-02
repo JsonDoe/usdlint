@@ -1,0 +1,44 @@
+# Built-in "default" profile of usdguard.
+#
+# Copy this file to start a studio profile, then run it with
+#   usdguard check --profile path/to/studio.toml assets/**/*.usda
+# or put it in a directory listed in USDGUARD_PROFILE_PATH and run
+#   usdguard check --profile studio assets/**/*.usda
+#
+# Write regular expressions as single-quoted TOML literal strings so that
+# backslashes reach the regular expression engine unchanged.
+
+fail_on = "error"
+load = "all"
+checks = [
+    "stage.metadata",
+    "naming.prim_name",
+    "deps.absolute_arc_path",
+    "deps.absolute_asset_attr",
+    "deps.unresolved",
+    "shading.material_binding",
+    "model.hierarchy",
+    "geom.primvar_size",
+    "geom.extent",
+    "compliance.usdchecker",
+]
+
+[severity]
+"naming.prim_name" = "warning"
+"shading.material_binding" = "warning"
+
+[options."stage.metadata"]
+up_axis = "Y"
+meters_per_unit = 0.01
+
+[options."naming.prim_name".rules]
+Mesh = '^[a-z][a-zA-Z0-9]*_GEO$'
+Xform = '^[a-z][a-zA-Z0-9]*_GRP$'
+
+[options."compliance.usdchecker"]
+# These validators duplicate stage.metadata and deps.unresolved.
+exclude = [
+    "usdGeomValidators:StageMetadataChecker",
+    "usdValidation:StageMetadataChecker",
+    "usdUtilsValidators:MissingReferenceValidator",
+]

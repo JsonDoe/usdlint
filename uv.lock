@@ -767,6 +767,7 @@ wheels = [
 name = "usdguard"
 source = { editable = "." }
 dependencies = [
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "usd-core" },
 ]
 
@@ -780,7 +781,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "usd-core", specifier = ">=25.11" }]
+requires-dist = [
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=1.1" },
+    { name = "usd-core", specifier = ">=25.11" },
+]
 
 [package.metadata.requires-dev]
 dev = [
