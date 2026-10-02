@@ -18,7 +18,8 @@ reporters, M4 docs + release, M5 optional Qt UI (`[ui]` extra, separate
 branch). The full specification is kept by the maintainer outside the
 repository; the design below condenses it. Ask when a detail is missing.
 
-Status: M0 (scaffold) complete and awaiting review; M1 not started.
+Status: M0 scaffold, M1 core and M2 checks are done; M3 (profiles, CLI,
+reporters) is in progress.
 
 ## Commands
 
@@ -149,11 +150,25 @@ config or stage-open error; with several stages, the max code wins.
   idiomatic `Prim.IsA(UsdGeom.Mesh)` and lacks `pxr.UsdValidation`.
   mypy ignores missing imports for `pxr` only.
 - `UsdUtils.ComplianceChecker` was deprecated in usd-core 26.5 and
-  removed in 26.8. Proposed for M2: build `compliance.usdchecker` on
-  `pxr.UsdValidation` (Python API since usd-core 25.2); confirm with the
-  maintainer first.
-- The usd-core version floor is set in M2 with the real API usage
-  (expected `>=25.2`); `tomli` is added in M3 with the profile loader.
+  removed in 26.8, so `compliance.usdchecker` wraps `pxr.UsdValidation`
+  like `usdchecker` does: every validator except RootPackageValidator,
+  narrowed by the `keywords` and `exclude` options. In-memory stages are
+  skipped with an INFO issue, as for `deps.unresolved`.
+- usd-core floor is 25.11, measured: 25.2 to 25.8 crash inside
+  UsdValidation ("Connectable behavior already registered") and lack
+  the gprim encapsulation validator. The `minimum-usd` CI job installs
+  exactly the floor; keep both in sync.
+- Severity overrides replace a check's default severity only; issues a
+  check reports with an explicit severity (INFO notes, compliance
+  warnings) and crash issues keep theirs.
+- `RegistryError` and `StageOpenError` were added to the spec's error
+  list (plugin consistency errors and unopenable stages).
+- `Report.check_ids` (checks that ran) was added for the JUnit
+  reporter, which needs one testcase per check, including passing ones.
+- Prim checks traverse the stage, then each prototype (skipping
+  prototype roots); `shading.material_binding` traverses instance
+  proxies instead, because bindings authored on instances apply there.
+- `tomli` is added in M3 with the profile loader.
 
 ## Gotchas
 
@@ -164,6 +179,18 @@ config or stage-open error; with several stages, the max code wins.
   as `displayColor` and `displayOpacity` even when nothing is authored.
 - `UsdUtils.ComputeAllDependencies` returns empty lists for a missing
   root layer instead of reporting it as unresolved.
+- `Usd.Stage.HasDefaultPrim()` is true even when the named prim does not
+  exist; also test `GetDefaultPrim()`.
+- With `load="none"`, a prim carrying a payload is itself unloaded, so
+  the default traversal skips it along with its payload contents.
+- `UsdValidation.ValidationContext([...])` from Python: pass validator
+  objects (`GetOrLoadValidatorsByName`). Lists of strings or metadata
+  are claimed by the TfType overload and raise.
+- USDA fixtures: a nested prim cannot share its parent's line; a
+  `.timeSamples` line cannot carry metadata (declare it separately);
+  `purpose` is an attribute (`uniform token purpose = "proxy"`).
+- When rewriting files from Python on Windows, write with
+  `newline="\n"`: `Path.write_text` defaults to CRLF there.
 - pytest turns warnings into errors. Add a targeted, commented
   `filterwarnings` entry only once a warning is understood.
 - usd-core vendors its own `pxr`. Where USD is already provided (DCC,
