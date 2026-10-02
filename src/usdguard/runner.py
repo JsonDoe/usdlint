@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import logging
 import re
+from contextlib import contextmanager
 from dataclasses import replace
 from functools import partial
 from typing import TYPE_CHECKING, Literal
 
-from pxr import Tf, Usd
+from pxr import Tf, Usd, UsdUtils
 
 from usdguard.core import (
     Check,
@@ -31,13 +32,51 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 
 logger = logging.getLogger(__name__)
+usd_logger = logging.getLogger("usdguard.usd")
 
 LoadPolicy = Literal["all", "none"]
 """Payload policy when opening a stage: load every payload, or none."""
 
 LOAD_POLICIES: tuple[LoadPolicy, ...] = ("all", "none")
 
+OPEN_CHECK_ID = "usdguard.open"
+"""Pseudo check_id of the issue reporting a stage that cannot be opened."""
+
 _TF_ERROR_MESSAGE = re.compile(r" : '(?P<message>.*)'$")
+
+
+@contextmanager
+def usd_diagnostics_to_logging() -> Iterator[None]:
+    """Route USD diagnostics issued inside the block to Python logging.
+
+    USD prints its warnings to stderr, interleaved with report output.
+    Inside this block they are captured instead and logged on the
+    ``usdguard.usd`` logger when the block exits: USD errors at WARNING
+    level, warnings and status messages at INFO level.
+    """
+    delegate = UsdUtils.CoalescingDiagnosticDelegate()
+    try:
+        yield
+    finally:
+        for diagnostic in delegate.TakeUncoalescedDiagnostics():
+            level = (
+                logging.WARNING
+                if "ERROR" in str(diagnostic.diagnosticCodeString)
+                else logging.INFO
+            )
+            usd_logger.log(level, "USD: %s", diagnostic.commentary)
+
+
+def open_failure_report(
+    error: Exception, *, fail_on: Severity = Severity.ERROR
+) -> Report:
+    """Return the report of a stage that could not be opened.
+
+    It holds a single ERROR issue from the ``usdguard.open`` pseudo
+    check, so reporters can show the failure like any other result.
+    """
+    issue = Issue(OPEN_CHECK_ID, Severity.ERROR, str(error))
+    return Report(issues=(issue,), fail_on=fail_on, check_ids=(OPEN_CHECK_ID,))
 
 
 def open_stage(path: str, *, load: LoadPolicy = "all") -> Usd.Stage:

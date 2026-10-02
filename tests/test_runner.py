@@ -11,7 +11,13 @@ import pytest
 from usdguard import runner as runner_module
 from usdguard.core import Context, Issue, PrimCheck, Severity, StageCheck
 from usdguard.errors import StageOpenError
-from usdguard.runner import open_stage, run
+from usdguard.runner import (
+    OPEN_CHECK_ID,
+    open_failure_report,
+    open_stage,
+    run,
+    usd_diagnostics_to_logging,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -357,3 +363,57 @@ def test_load_none_hides_payload_contents(tmp_path: Path) -> None:
     # A prim whose payload is unloaded is itself unloaded, so the default
     # traversal skips it along with everything the payload brings in.
     assert paths("none") == []
+
+
+def test_usd_diagnostics_are_logged_instead_of_printed(
+    make_stage: StageFactory,
+    caplog: pytest.LogCaptureFixture,
+    capfd: pytest.CaptureFixture[str],
+) -> None:
+    caplog.set_level(logging.INFO, logger="usdguard.usd")
+
+    with usd_diagnostics_to_logging():
+        make_stage('def Xform "a" (references = @./missing.usda@) {}')
+
+    (record,) = caplog.records
+    assert record.levelno == logging.INFO
+    assert record.getMessage().startswith("USD: ")
+    assert "missing.usda" in record.getMessage()
+    assert capfd.readouterr().err == ""
+
+
+def test_usd_errors_are_logged_as_warnings(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    diagnostic = SimpleNamespace(
+        diagnosticCodeString="TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE",
+        commentary="something broke",
+    )
+    delegate = SimpleNamespace(TakeUncoalescedDiagnostics=lambda: [diagnostic])
+    monkeypatch.setattr(
+        runner_module,
+        "UsdUtils",
+        SimpleNamespace(CoalescingDiagnosticDelegate=lambda: delegate),
+    )
+    caplog.set_level(logging.INFO, logger="usdguard.usd")
+
+    with usd_diagnostics_to_logging():
+        pass
+
+    (record,) = caplog.records
+    assert (record.levelno, record.getMessage()) == (
+        logging.WARNING,
+        "USD: something broke",
+    )
+
+
+def test_open_failures_become_a_single_error_issue() -> None:
+    report = open_failure_report(
+        StageOpenError("Cannot open stage 'x.usda'"), fail_on=Severity.WARNING
+    )
+
+    assert report.issues == (
+        Issue(OPEN_CHECK_ID, Severity.ERROR, "Cannot open stage 'x.usda'"),
+    )
+    assert report.check_ids == ("usdguard.open",)
+    assert report.fail_on is Severity.WARNING
