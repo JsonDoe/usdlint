@@ -36,7 +36,22 @@ classifiers = [
     "Topic :: Software Development :: Quality Assurance",
     "Typing :: Typed",
 ]
-dependencies = ["usd-core"]
+# 25.11 is the oldest usd-core whose UsdValidation framework runs cleanly:
+# earlier releases crash while registering UsdShade connectable behaviors
+# and lack the gprim encapsulation validator. CI tests this floor.
+dependencies = ["usd-core>=25.11"]
+
+[project.entry-points."usdguard.checks"]
+"naming.prim_name" = "usdguard.checks.naming:PrimNameCheck"
+"stage.metadata" = "usdguard.checks.stage:StageMetadataCheck"
+"deps.absolute_arc_path" = "usdguard.checks.deps:AbsoluteArcPathCheck"
+"deps.absolute_asset_attr" = "usdguard.checks.deps:AbsoluteAssetAttrCheck"
+"deps.unresolved" = "usdguard.checks.deps:UnresolvedDependencyCheck"
+"shading.material_binding" = "usdguard.checks.shading:MaterialBindingCheck"
+"model.hierarchy" = "usdguard.checks.model:ModelHierarchyCheck"
+"geom.primvar_size" = "usdguard.checks.geom:PrimvarSizeCheck"
+"geom.extent" = "usdguard.checks.geom:ExtentCheck"
+"compliance.usdchecker" = "usdguard.checks.compliance:UsdCheckerCheck"
 
 [project.urls]
 Homepage = "https://github.com/JsonDoe/usdlint"

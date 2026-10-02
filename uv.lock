@@ -780,7 +780,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "usd-core" }]
+requires-dist = [{ name = "usd-core", specifier = ">=25.11" }]
 
 [package.metadata.requires-dev]
 dev = [
