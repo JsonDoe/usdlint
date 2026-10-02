@@ -18,8 +18,9 @@ reporters, M4 docs + release, M5 optional Qt UI (`[ui]` extra, separate
 branch). The full specification is kept by the maintainer outside the
 repository; the design below condenses it. Ask when a detail is missing.
 
-Status: M0 scaffold, M1 core and M2 checks are done; M3 (profiles, CLI,
-reporters) is in progress.
+Status: M0 to M4 are done on `dev` (scaffold, core, checks, profiles +
+CLI + reporters, docs + release). M5, the optional Qt UI, lives on the
+`feat/ui` branch.
 
 ## Commands
 
@@ -33,6 +34,7 @@ uv run pytest --no-cov tests/test_x.py   # focused run, no coverage gate
 uv run pre-commit run --all-files
 uv run --isolated --python 3.14 pytest   # another interpreter
 uv build                                 # sdist + wheel into dist/
+uv run usdguard check "examples/stages/*.usda"
 ```
 
 A change is done only when `ruff check`, `ruff format --check`,
@@ -168,7 +170,18 @@ config or stage-open error; with several stages, the max code wins.
 - Prim checks traverse the stage, then each prototype (skipping
   prototype roots); `shading.material_binding` traverses instance
   proxies instead, because bindings authored on instances apply there.
-- `tomli` is added in M3 with the profile loader.
+- CLI and UI wrap stage opening and validation in
+  `runner.usd_diagnostics_to_logging()`, so USD warnings go to the
+  `usdguard.usd` logger (shown with `-v`) instead of stderr.
+- A stage that cannot be opened becomes a report with one `usdguard.open`
+  ERROR issue (`runner.open_failure_report`), so every reporter shows it;
+  the CLI exits with code 2 for it.
+- `examples/stages` was generated once with a throwaway script so that
+  extents are exact; `tests/test_examples.py` keeps the README claims
+  about those files true.
+- Releases: `release.yml` runs on `v*` tags, refuses a tag that differs
+  from `__version__`, publishes with PyPI trusted publishing (environment
+  `pypi`) and creates the GitHub Release from the CHANGELOG section.
 
 ## Gotchas
 
