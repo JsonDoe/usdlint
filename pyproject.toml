@@ -48,6 +48,7 @@ ui = ["Qt.py>=2.0", "PySide6>=6.5"]
 
 [project.scripts]
 usdguard = "usdguard.cli:main"
+usdguard-ui = "usdguard.ui.app:main"
 
 [project.entry-points."usdguard.checks"]
 "naming.prim_name" = "usdguard.checks.naming:PrimNameCheck"
