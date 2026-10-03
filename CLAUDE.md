@@ -19,8 +19,8 @@ branch). The full specification is kept by the maintainer outside the
 repository; the design below condenses it. Ask when a detail is missing.
 
 Status: M0 to M4 are done on `dev` (scaffold, core, checks, profiles +
-CLI + reporters, docs + release). M5, the optional Qt UI, lives on the
-`feat/ui` branch.
+CLI + reporters, docs + release). M5, the optional Qt UI, is done on the
+`feat/ui` branch, awaiting review before it is merged.
 
 ## Commands
 
@@ -35,6 +35,9 @@ uv run pre-commit run --all-files
 uv run --isolated --python 3.14 pytest   # another interpreter
 uv build                                 # sdist + wheel into dist/
 uv run usdguard check "examples/stages/*.usda"
+uv sync --extra ui --group ui            # Qt UI + pytest-qt
+uv run pytest -m ui --no-cov             # UI tests (QT_QPA_PLATFORM=offscreen)
+uv run usdguard-ui examples/stages/chair_broken.usda
 ```
 
 A change is done only when `ruff check`, `ruff format --check`,
@@ -183,6 +186,14 @@ config or stage-open error; with several stages, the max code wins.
   from `__version__`, publishes with PyPI trusted publishing (environment
   `pypi`) and creates the GitHub Release from the CHANGELOG section.
 
+- UI (M5): Qt.py shim with PySide6 (extra `ui`) or PySide2. The Qt code
+  is typed against the PySide6 stubs that Qt.py depends on; where Qt is
+  not installed, mypy overrides make `Qt` untyped and allow
+  `usdguard.ui.*` to subclass Any. `src/usdguard/ui` is omitted from
+  coverage, and UI tests are marked `ui` and deselected by default.
+- PySide2 only exists up to Python 3.10, and pytest-qt 4.4 is the last
+  release that supports it; CI pins both in the PySide2 job.
+
 ## Gotchas
 
 - pxr values are `Any` for mypy. Under strict mode, returning one from a
@@ -215,3 +226,11 @@ config or stage-open error; with several stages, the max code wins.
   `astral-sh/setup-uv` publishes no floating major tags after v7, so
   `@v10` does not resolve. Check that a ref exists before using it.
 - Line endings are LF everywhere (`.gitattributes`), including Windows.
+- Qt: write enums fully qualified (`QtCore.Qt.ItemDataRole.DisplayRole`),
+  which works with both bindings. `QSortFilterProxyModel.invalidateFilter`
+  is deprecated since Qt 6.10 (a DeprecationWarning, so an error in
+  tests): use `beginFilterChange`/`endFilterChange` when present. PySide2
+  has only `exec_()`. The types-PySide6 stubs claim
+  `QApplication.instance()` never returns None.
+- The offscreen Qt platform has no fonts on Windows. For screenshots,
+  use the native platform with `WA_DontShowOnScreen` and `widget.grab()`.

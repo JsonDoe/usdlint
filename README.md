@@ -68,6 +68,7 @@ flowchart LR
     Stage[("USD stage")] --> Runner
     Runner --> Report["Report<br/>(immutable, sorted)"]
     Report --> Reporters["reporters<br/>text · JSON · JUnit"]
+    Report --> UI["ui (optional)<br/>Qt window, worker thread"]
 ```
 
 | Module | Responsibility |
@@ -78,6 +79,36 @@ flowchart LR
 | `profiles.py` | Finds, parses and validates TOML profiles, then instantiates the checks they enable. |
 | `reporters/` | Text, JSON (versioned schema) and JUnit XML output. |
 | `cli.py` | The `usdguard` command. |
+| `ui/` | Optional Qt window (`usdguard-ui`): a table model over the report, a filter proxy, and a worker thread. |
+
+## Desktop UI (optional)
+
+![The usdguard window listing the issues of a broken asset](docs/images/ui.png)
+
+```sh
+pip install "usdguard[ui]"
+usdguard-ui examples/stages/chair_broken.usda
+```
+
+The window does the following:
+
+- **Choose what to validate.** Pick a stage with *Browse* or drop a
+  `.usd*` file on the window. Choose the profile: a built-in name, a
+  name found in `USDGUARD_PROFILE_PATH`, or a TOML file. Choose the
+  payload policy, then press *Validate* (F5).
+- **Explore the issues.** Narrow the table to a severity or a check,
+  and sort any column (severities sort by seriousness). Select a row to
+  see the whole issue below the table, or right-click it to copy its
+  prim path or message.
+- **Validate in the background.** A worker `QObject` in a `QThread`
+  opens its own stage, so the window stays responsive. Only the
+  immutable `Report` comes back to the UI thread; no USD object crosses
+  threads.
+
+The UI uses the [Qt.py](https://github.com/mottosso/Qt.py) shim and is
+tested with both PySide6 and PySide2. Inside a DCC that already ships a
+Qt binding, install `usdguard` and `Qt.py` without the extra; the UI
+then uses the host's binding.
 
 ## Check catalog
 

@@ -10,6 +10,12 @@ and this project adheres to
 
 ### Added
 
+- Optional Qt desktop UI, `usdguard-ui`, installed with the `ui` extra.
+  - Built on Qt.py; works with PySide6 and PySide2.
+  - Pick a stage and a profile, filter by severity or check, sort, and
+    see the details of each issue.
+  - Validation runs in a worker thread, and only the immutable `Report`
+    crosses threads.
 - `usdguard check`: validates stages, or glob patterns expanded by
   usdguard itself, against a profile.
   - Writes a text, JSON or JUnit report to stdout or to a file.

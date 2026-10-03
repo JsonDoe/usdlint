@@ -20,3 +20,10 @@ uv run usdguard check examples/stages/chair_broken.usda --profile examples/profi
 ```
 
 `chair_broken.usda` exits with code 1, and the clean stages with 0.
+
+Or browse them in the desktop UI:
+
+```sh
+uv sync --extra ui
+uv run usdguard-ui examples/stages/chair_broken.usda
+```

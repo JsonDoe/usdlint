@@ -43,6 +43,19 @@ uv run pytest               # enforces the 90% coverage gate
 the coverage gate. `uv run pre-commit run --all-files` runs every hook,
 like the CI lint job.
 
+The Qt UI tests are marked `ui` and skipped by default. To run them,
+install the UI extra and test group; on headless machines, also set
+`QT_QPA_PLATFORM=offscreen`:
+
+```sh
+uv sync --extra ui --group ui
+uv run pytest -m ui --no-cov
+```
+
+They are excluded from the coverage gate. CI runs them with PySide6
+(Linux and Windows) and with PySide2 (Python 3.10). A plain `uv sync`
+removes the UI packages again.
+
 ## Conventions
 
 - **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/)
