@@ -41,6 +41,11 @@ classifiers = [
 # and lack the gprim encapsulation validator. CI tests this floor.
 dependencies = ["usd-core>=25.11", "tomli>=1.1; python_version < '3.11'"]
 
+[project.optional-dependencies]
+# Qt UI. Inside a DCC that already provides a Qt binding, install only
+# Qt.py: it picks up the host's PySide6 or PySide2.
+ui = ["Qt.py>=2.0", "PySide6>=6.5"]
+
 [project.scripts]
 usdguard = "usdguard.cli:main"
 
@@ -70,6 +75,7 @@ dev = [
     "pytest-cov>=7.1",
     "ruff>=0.16.10",
 ]
+ui = ["pytest-qt>=4.4"]
 
 [tool.hatch.version]
 path = "src/usdguard/__init__.py"
@@ -134,6 +140,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["D"]
+# Qt overrides keep the camelCase names of the Qt API.
+"src/usdguard/ui/**" = ["N802"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -170,6 +178,18 @@ enable_error_code = [
 module = ["pxr", "pxr.*"]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+# The ui extra is optional. Where Qt.py is not installed (main CI jobs,
+# pre-commit), Qt is untyped and the UI classes derive from Any; with it,
+# the UI is checked against the PySide6 stubs that Qt.py depends on.
+module = ["Qt", "Qt.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["usdguard.ui.*"]
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
+
 [tool.pytest]
 minversion = "9.1"
 testpaths = ["tests"]
@@ -178,6 +198,11 @@ addopts = [
     "--import-mode=importlib",
     "--cov",
     "--cov-report=term-missing",
+    "-m",
+    "not ui",
+]
+markers = [
+    "ui: Qt UI tests; run with `pytest -m ui --no-cov` after installing the ui extra and group",
 ]
 strict = true
 filterwarnings = ["error"]
@@ -185,6 +210,9 @@ filterwarnings = ["error"]
 [tool.coverage.run]
 source_pkgs = ["usdguard"]
 branch = true
+# The optional Qt UI is tested separately (pytest -m ui) and excluded
+# from the coverage gate.
+omit = ["*/usdguard/ui/*"]
 
 [tool.coverage.report]
 fail_under = 90
